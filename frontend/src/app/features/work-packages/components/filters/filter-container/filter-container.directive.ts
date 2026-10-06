@@ -26,7 +26,7 @@
 // See COPYRIGHT and LICENSE files for more details.
 //++
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, Output, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject } from '@angular/core';
 import {
   WorkPackageViewFiltersService,
 } from 'core-app/features/work-packages/routing/wp-view-base/view-services/wp-view-filters.service';
@@ -56,7 +56,15 @@ export class WorkPackageFilterContainerComponent extends UntilDestroyedMixin imp
 
   @Input() filterButtonText:string = I18n.t('js.button_filter');
 
+  @Input() showSemanticToggle = false;
+
   @Output() public filtersChanged = new DebouncedEventEmitter<QueryFilterInstanceResource[]>(componentDestroyed(this));
+
+  @Output() public semanticToggleChange = new EventEmitter<boolean>();
+
+  public semanticEnabled = true;
+
+  public semanticToggleText = I18n.t('js.global_search.semantic_search');
 
   public visible$:Observable<boolean>;
 

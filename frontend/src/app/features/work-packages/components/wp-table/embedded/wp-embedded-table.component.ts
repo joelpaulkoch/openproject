@@ -78,6 +78,8 @@ export class WorkPackageEmbeddedTableComponent extends WorkPackageEmbeddedBaseCo
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   @Output() public onQueryLoaded = new EventEmitter<QueryResource>();
 
+  @Output() public semanticToggleChange = new EventEmitter<boolean>();
+
   readonly apiv3Service = inject(ApiV3Service);
 
   readonly opModalService = inject(OpModalService);

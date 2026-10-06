@@ -3664,6 +3664,7 @@ en:
       messages: "Forum"
       wiki_pages: "Wiki"
     placeholder: "Search in %{app_title}"
+    semantic_search: "Semantic search"
     title:
       all_projects: 'Search for "%{search_term}" in all projects'
       current_project: 'Search for "%{search_term}" in %{project_name}'

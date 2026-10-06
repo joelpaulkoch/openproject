@@ -7,6 +7,14 @@
     <i class="button--icon icon-filter"></i>
     <span class="button--text" [textContent]="filterButtonText"></span>
   </button>
+  @if (showSemanticToggle) {
+    <label class="button -small">
+      <input type="checkbox"
+             [checked]="semanticEnabled"
+             (change)="semanticEnabled = !semanticEnabled; semanticToggleChange.emit(semanticEnabled)" />
+      <span class="button--text" [textContent]="semanticToggleText"></span>
+    </label>
+  }
 }
 
 <div

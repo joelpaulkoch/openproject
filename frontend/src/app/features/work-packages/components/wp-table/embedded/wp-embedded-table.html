@@ -9,7 +9,9 @@
       <!-- Filter container (if requested) -->
       @if (configuration.withFilters) {
         <op-filter-container [showFilterButton]="configuration.showFilterButton"
-          [filterButtonText]="configuration.filterButtonText" />
+          [filterButtonText]="configuration.filterButtonText"
+          [showSemanticToggle]="configuration.showSemanticToggle"
+          (semanticToggleChange)="semanticToggleChange.emit($event)" />
       }
       <!-- TABLE + TIMELINE horizontal split -->
       @if (!configuration.isCardView) {

@@ -36,6 +36,8 @@ import {
   OnInit,
   Renderer2,
 } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { take } from 'rxjs/operators';
 import { I18nService } from 'core-app/core/i18n/i18n.service';
 import { HalResourceService } from 'core-app/features/hal/services/hal-resource.service';
 import {
@@ -59,7 +61,8 @@ import { CurrentProjectService } from 'core-app/core/current-project/current-pro
   hostDirectives: [WorkPackageIsolatedQuerySpaceDirective],
   template: `
     <wp-embedded-table [queryProps]="queryProps"
-                       [configuration]="tableConfiguration" />
+                       [configuration]="tableConfiguration"
+                       (semanticToggleChange)="onSemanticToggle($event)" />
   `,
   standalone: false,
 })
@@ -67,6 +70,8 @@ export class GlobalSearchWorkPackagesComponent extends UntilDestroyedMixin imple
   @Input() public searchTerm:string;
 
   @Input() public scope:'all'|'current_project'|'';
+
+  private semanticEnabled = true;
 
   public queryProps:Partial<QueryRequestParams>;
 
@@ -78,6 +83,7 @@ export class GlobalSearchWorkPackagesComponent extends UntilDestroyedMixin imple
   readonly querySpace= inject(IsolatedQuerySpace);
   readonly currentProject= inject(CurrentProjectService);
   readonly cdRef= inject(ChangeDetectorRef);
+  readonly http= inject(HttpClient);
 
   public tableConfiguration:WorkPackageTableConfigurationObject = {
     actionsColumnEnabled: false,
@@ -87,6 +93,7 @@ export class GlobalSearchWorkPackagesComponent extends UntilDestroyedMixin imple
     withFilters: true,
     showFilterButton: true,
     filterButtonText: this.I18n.t('js.button_advanced_filter'),
+    showSemanticToggle: true,
   };
 
   constructor() {
@@ -95,15 +102,49 @@ export class GlobalSearchWorkPackagesComponent extends UntilDestroyedMixin imple
   }
 
   ngOnInit():void {
-    this.setQueryProps();
+    if (!this.searchTermIsId && this.searchTerm.length > 0) {
+      this.loadSemanticResults();
+    } else {
+      this.setQueryProps();
+    }
   }
 
-  private setQueryProps():void {
+  public onSemanticToggle(enabled:boolean):void {
+    this.semanticEnabled = enabled;
+    if (enabled && !this.searchTermIsId && this.searchTerm.length > 0) {
+      this.loadSemanticResults();
+    } else {
+      this.setQueryProps();
+      this.cdRef.detectChanges();
+    }
+  }
+
+  private loadSemanticResults():void {
+    const url = `/api/v3/work_packages/semantic_search?q=${encodeURIComponent(this.searchTerm)}`;
+
+    this.http
+      .get<{ _embedded:{ elements:{ id:number }[] } }>(url)
+      .pipe(take(1))
+      .subscribe((response) => {
+        const ids = response._embedded.elements.map((wp) => String(wp.id));
+        this.setQueryProps(ids);
+        this.cdRef.detectChanges();
+      });
+  }
+
+  private setQueryProps(semanticIds?:string[]):void {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const filters:any[] = [];
     let columns = ['id', 'project', 'subject', 'type', 'status', 'updatedAt'];
 
-    if (this.searchTermIsId) {
+    if (semanticIds) {
+      filters.push({
+        id: {
+          operator: '=',
+          values: semanticIds,
+        },
+      });
+    } else if (this.searchTermIsId) {
       filters.push({
         id: {
           operator: '=',

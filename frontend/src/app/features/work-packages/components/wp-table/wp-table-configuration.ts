@@ -74,6 +74,9 @@ export class WorkPackageTableConfiguration {
   /** Whether the button to open filters shall be visible */
   public showFilterButton = false;
 
+  /** Whether the semantic search toggle shall be visible next to the filter button */
+  public showSemanticToggle = false;
+
   /** Whether this table provides a UI for filters */
   public filterButtonText:string = I18n.t('js.button_filter');
 
