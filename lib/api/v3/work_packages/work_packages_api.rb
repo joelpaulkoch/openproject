@@ -42,6 +42,7 @@ module API
           # This is also true when the :id param is declared to be of type: Integer.
           mount ::API::V3::WorkPackages::AvailableProjectsOnCreateAPI
           mount ::API::V3::WorkPackages::Schema::WorkPackageSchemasAPI
+          mount ::API::V3::WorkPackages::SemanticSearchAPI
 
           get do
             authorize_in_any_work_package(:view_work_packages)
